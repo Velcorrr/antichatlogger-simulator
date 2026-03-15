@@ -1,68 +1,84 @@
 :root {
   --discord-bg: #313338;
-  --discord-surface: #2b2d31;
+  --discord-sidebar: #2b2d31;
+  --discord-surface: #232428;
   --discord-surface-alt: #1e1f22;
   --discord-border: #3f4147;
-  --discord-text: #dbdee1;
+  --discord-text: #f2f3f5;
   --discord-text-muted: #b5bac1;
   --discord-brand: #5865f2;
   --discord-brand-hover: #4752c4;
-  --discord-success: #3ba55d;
+  --discord-green: #57f287;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1a1b1e #2b2d31;
 }
 
 body {
-  background: radial-gradient(circle at top, #3d3f45 0%, var(--discord-bg) 45%);
+  background:
+    radial-gradient(circle at 20% -10%, rgba(88, 101, 242, 0.35), transparent 35%),
+    radial-gradient(circle at 80% 120%, rgba(87, 242, 135, 0.12), transparent 40%),
+    var(--discord-bg);
   color: var(--discord-text);
   font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+/* Main app shell */
 #root > div {
   background: transparent !important;
 }
 
-/* Soften dark utility panels into Discord-like cards */
+#root > div > .relative.max-w-6xl {
+  max-width: 1240px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid #1a1b1e;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(180deg, #2f3136 0%, #2b2d31 100%);
+}
+
+/* Left / right columns mimic Discord sidebars */
+#root [class*="md:col-span-3"],
+#root [class*="md:col-span-4"] {
+  background: linear-gradient(180deg, #2b2d31 0%, #26282c 100%);
+  border-right: 1px solid #1f2023;
+  padding: 1.2rem;
+}
+
+#root [class*="md:col-span-5"] {
+  background: linear-gradient(180deg, #313338 0%, #2f3136 100%);
+  padding: 1rem 1.2rem;
+}
+
+/* Cards and panels */
 [class*="bg-zinc-900"],
 [class*="bg-zinc-800"],
 [class*="bg-zinc-950"] {
-  background-color: color-mix(in oklab, var(--discord-surface) 90%, #000) !important;
-  border-color: var(--discord-border) !important;
+  background: linear-gradient(180deg, var(--discord-surface) 0%, var(--discord-surface-alt) 100%) !important;
+  border: 1px solid var(--discord-border) !important;
 }
 
 [class*="rounded-xl"],
 [class*="rounded-lg"] {
-  border-radius: 12px !important;
+  border-radius: 14px !important;
 }
 
-h1, h2, h3 {
-  letter-spacing: 0.01em;
+[class*="p-4"][class*="border"] {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
 }
 
-button {
-  border-radius: 10px !important;
-  border: 1px solid transparent;
-  transition: background-color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+/* Typography polish */
+h1,
+h2,
+h3 {
+  letter-spacing: 0.012em;
 }
 
-button:not(:disabled) {
-  background-color: var(--discord-brand);
-  color: #fff;
-}
-
-button:not(:disabled):hover {
-  background-color: var(--discord-brand-hover) !important;
-  border-color: #7983f5;
-}
-
-button:disabled {
-  background-color: var(--discord-surface-alt) !important;
-  color: #80848e !important;
-  border-color: var(--discord-border);
-}
-
-/* Keep shop tiles visually layered */
-button [class*="text-xs"],
-button [class*="text-sm"] {
-  color: #f2f3f5;
+[class*="tracking-tighter"] {
+  letter-spacing: -0.015em !important;
 }
 
 [class*="text-zinc-400"],
@@ -72,7 +88,45 @@ button [class*="text-sm"] {
 }
 
 [class*="text-green-400"] {
-  color: #57f287 !important;
+  color: var(--discord-green) !important;
+  text-shadow: 0 0 12px rgba(87, 242, 135, 0.25);
+}
+
+/* Buttons get modern Discord treatment */
+button {
+  border-radius: 10px !important;
+  border: 1px solid transparent;
+  transition: background-color 0.14s ease, border-color 0.14s ease, transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+button:not(:disabled) {
+  background: linear-gradient(180deg, #5865f2 0%, #4e5bd7 100%);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(88, 101, 242, 0.25);
+}
+
+button:not(:disabled):hover {
+  background: linear-gradient(180deg, #6975f8 0%, #5563e5 100%) !important;
+  border-color: #8891ff;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  background: #2a2c31 !important;
+  color: #7e828a !important;
+  border-color: #3a3d43;
+  box-shadow: none;
+}
+
+/* Nested icon chips inside buttons */
+button > div > div:first-child {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+button [class*="text-xs"],
+button [class*="text-sm"] {
+  color: #f2f3f5;
 }
 
 [class*="border-zinc-700"],
@@ -81,8 +135,20 @@ button [class*="text-sm"] {
   border-color: var(--discord-border) !important;
 }
 
-/* Subtle glass effect for side panels */
-[class*="p-4"][class*="border"] {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(3px);
+/* Character select gets stronger visual flair */
+[class*="fixed inset-0 bg-black/90"] {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(88, 101, 242, 0.35), transparent 45%),
+    rgba(10, 10, 12, 0.92) !important;
+}
+
+/* Soft animated pulse on brand heading */
+@keyframes discordPulse {
+  0%,
+  100% { filter: drop-shadow(0 0 0 rgba(88, 101, 242, 0)); }
+  50% { filter: drop-shadow(0 0 12px rgba(88, 101, 242, 0.45)); }
+}
+
+#root h1[class*="bg-gradient-to-r"] {
+  animation: discordPulse 2.8s ease-in-out infinite;
 }
