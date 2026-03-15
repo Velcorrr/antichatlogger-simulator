@@ -18,7 +18,14 @@
   scrollbar-color: #1a1b1e #2b2d31;
 }
 
+html,
 body {
+  background-color: #111318;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
   background:
     radial-gradient(circle at 20% -10%, rgba(88, 101, 242, 0.35), transparent 35%),
     radial-gradient(circle at 80% 120%, rgba(87, 242, 135, 0.12), transparent 40%),
