@@ -1,17 +1,17 @@
 :root {
-  --discord-bg: #313338;
+  --discord-bg: #1e1f22;
   --discord-app: #2b2d31;
-  --discord-sidebar: #232428;
-  --discord-sidebar-alt: #1e1f22;
-  --discord-surface: #2f3136;
-  --discord-surface-raised: #383a40;
+  --discord-sidebar: #111318;
+  --discord-sidebar-soft: #1a1c22;
+  --discord-channel: #313338;
+  --discord-chat: #2b2d31;
+  --discord-member: #232428;
   --discord-border: #1a1b1e;
   --discord-text: #dbdee1;
-  --discord-text-muted: #949ba4;
-  --discord-text-faint: #6d737c;
+  --discord-muted: #949ba4;
+  --discord-faint: #6d737c;
   --discord-brand: #5865f2;
   --discord-brand-hover: #4752c4;
-  --discord-green: #3ba55d;
 }
 
 * {
@@ -23,7 +23,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--discord-bg);
+  background: radial-gradient(circle at 0% 0%, #23272f 0%, #1e1f22 45%);
   color: var(--discord-text);
   font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -31,48 +31,72 @@ body {
 #root,
 #root > div {
   min-height: 100vh;
-  background: var(--discord-bg) !important;
+  background: transparent !important;
 }
 
-/* Core app shell: less flashy, more Discord-like */
+/* App shell */
 #root > div > .relative.max-w-6xl {
-  max-width: 1240px;
-  border-radius: 10px;
+  position: relative;
+  max-width: 1460px;
+  border-radius: 0;
   overflow: hidden;
   border: 1px solid var(--discord-border);
   background: var(--discord-app);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.45);
 }
 
 #root > div > .relative.max-w-6xl::before,
 #root > div > .relative.max-w-6xl::after {
-  display: none;
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
 }
 
-/* Three-column Discord layout feel */
+/* Fake server rail like Discord */
+#root > div > .relative.max-w-6xl::before {
+  width: 72px;
+  background: linear-gradient(180deg, #0f1116 0%, #111318 100%);
+  border-right: 1px solid #0b0c0f;
+  z-index: 2;
+}
+
+/* Left nav column starts after server rail */
 #root [class*="md:col-span-3"] {
-  background: linear-gradient(180deg, var(--discord-sidebar) 0%, var(--discord-sidebar-alt) 100%);
-  border-right: 1px solid var(--discord-border);
-  padding: 1rem;
+  margin-left: 72px;
+  background: linear-gradient(180deg, var(--discord-sidebar) 0%, var(--discord-sidebar-soft) 100%);
+  border-right: 1px solid #0f1116;
+  padding: 0.9rem;
 }
 
+/* Chat column */
 #root [class*="md:col-span-5"] {
-  background: var(--discord-bg);
-  border-right: 1px solid var(--discord-border);
-  padding: 1rem;
+  background: linear-gradient(180deg, var(--discord-channel) 0%, var(--discord-chat) 100%);
+  border-right: 1px solid #23252a;
+  padding: 0;
 }
 
+/* Profile/member column */
 #root [class*="md:col-span-4"] {
-  background: linear-gradient(180deg, #26272b 0%, #232428 100%);
-  padding: 1rem;
+  background: linear-gradient(180deg, #2a2c32 0%, var(--discord-member) 100%);
+  padding: 0.85rem;
 }
 
-/* Cards/panels */
+/* Sidebar sections */
+#root [class*="md:col-span-3"] [class*="text-xs"],
+#root [class*="md:col-span-3"] [class*="uppercase"] {
+  color: var(--discord-faint) !important;
+  letter-spacing: 0.02em;
+}
+
+/* Generic panel/card look */
 [class*="bg-zinc-900"],
 [class*="bg-zinc-800"],
 [class*="bg-zinc-950"] {
-  background: var(--discord-surface) !important;
-  border: 1px solid #222428 !important;
+  background: #1f2126 !important;
+  border: 1px solid #292c33 !important;
 }
 
 [class*="rounded-xl"],
@@ -80,9 +104,34 @@ body {
   border-radius: 8px !important;
 }
 
-[class*="p-4"][class*="border"] {
-  box-shadow: none;
-  backdrop-filter: none;
+/* Chat panel gets Discord spacing */
+#root [class*="md:col-span-5"] > div {
+  border-radius: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+#root [class*="md:col-span-5"] .h-96 {
+  height: calc(100vh - 240px) !important;
+  min-height: 460px;
+  background: #1f2128 !important;
+}
+
+/* Top bar / composer strip feel */
+#root [class*="md:col-span-5"] [class*="border-b"],
+#root [class*="md:col-span-5"] form {
+  background: #2b2d31 !important;
+  border-color: #202228 !important;
+}
+
+/* Right column gets profile-card vibe */
+#root [class*="md:col-span-4"] [class*="p-4"][class*="border"] {
+  background: linear-gradient(180deg, #3a1115 0%, #2b0f13 100%) !important;
+  border-color: #4a2226 !important;
+}
+
+#root [class*="md:col-span-4"] [class*="p-4"][class*="border"] + [class*="p-4"][class*="border"] {
+  margin-top: 0.65rem;
 }
 
 /* Typography */
@@ -100,7 +149,7 @@ h3 {
 [class*="text-zinc-400"],
 [class*="text-zinc-500"],
 [class*="text-zinc-600"] {
-  color: var(--discord-text-muted) !important;
+  color: var(--discord-muted) !important;
 }
 
 [class*="text-green-400"] {
@@ -108,7 +157,6 @@ h3 {
   text-shadow: none;
 }
 
-/* Brand heading style like Discord channel/server title */
 #root h1[class*="bg-gradient-to-r"] {
   background: none !important;
   color: #f2f3f5 !important;
@@ -116,7 +164,7 @@ h3 {
   animation: none;
 }
 
-/* Buttons: Discord primary + subtle neutrals */
+/* Buttons closer to Discord controls */
 button {
   border-radius: 6px !important;
   border: 1px solid transparent;
@@ -131,12 +179,7 @@ button:not(:disabled) {
 
 button:not(:disabled):hover {
   background: var(--discord-brand-hover) !important;
-  border-color: transparent;
   transform: translateY(0);
-}
-
-button:not(:disabled):active {
-  transform: translateY(1px);
 }
 
 button:disabled {
@@ -145,10 +188,8 @@ button:disabled {
   border-color: #3b3d43;
 }
 
-/* Upgrade list buttons: dark row style, keep affordance on right */
+/* Upgrade rows */
 #root button.w-full {
-  position: relative;
-  overflow: hidden;
   background: #2b2d31 !important;
   border: 1px solid #3a3d43 !important;
   box-shadow: none !important;
@@ -162,7 +203,7 @@ button:disabled {
   display: none;
 }
 
-/* Inputs/chat footer */
+/* Chat input */
 input,
 textarea {
   background: #1e1f22 !important;
@@ -172,17 +213,22 @@ textarea {
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--discord-text-faint);
+  color: var(--discord-faint);
 }
 
-/* Borders normalization */
 [class*="border-zinc-700"],
 [class*="border-zinc-800"],
 [class*="border-zinc-600"] {
   border-color: #3a3d43 !important;
 }
 
-/* If a modal ever appears, keep it Discord-dark */
-[class*="fixed inset-0 bg-black/90"] {
-  background: rgba(16, 17, 19, 0.88) !important;
+/* Mobile fallback for fake server rail */
+@media (max-width: 767px) {
+  #root > div > .relative.max-w-6xl::before {
+    display: none;
+  }
+
+  #root [class*="md:col-span-3"] {
+    margin-left: 0;
+  }
 }
