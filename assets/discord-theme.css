@@ -9,6 +9,8 @@
   --discord-brand: #5865f2;
   --discord-brand-hover: #4752c4;
   --discord-green: #57f287;
+  --discord-pink: #eb459e;
+  --discord-yellow: #fee75c;
 }
 
 * {
@@ -31,12 +33,32 @@ body {
 }
 
 #root > div > .relative.max-w-6xl {
+  position: relative;
+  isolation: isolate;
   max-width: 1240px;
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid #1a1b1e;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   background: linear-gradient(180deg, #2f3136 0%, #2b2d31 100%);
+}
+
+#root > div > .relative.max-w-6xl::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(from 45deg, rgba(88, 101, 242, 0.12), rgba(235, 69, 158, 0.08), rgba(254, 231, 92, 0.06), rgba(88, 101, 242, 0.12));
+  animation: spinAura 14s linear infinite;
+  z-index: -2;
+}
+
+#root > div > .relative.max-w-6xl::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(130deg, rgba(255, 255, 255, 0.03), transparent 30%, transparent 70%, rgba(255, 255, 255, 0.02));
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Left / right columns mimic Discord sidebars */
@@ -68,6 +90,26 @@ body {
 [class*="p-4"][class*="border"] {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(8px);
+}
+
+/* Make shop/upgrade buttons feel juicier */
+#root button.w-full {
+  position: relative;
+  overflow: hidden;
+}
+
+#root button.w-full::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.2) 48%, transparent 66%);
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+  pointer-events: none;
+}
+
+#root button.w-full:hover::after {
+  transform: translateX(120%);
 }
 
 /* Typography polish */
@@ -111,6 +153,10 @@ button:not(:disabled):hover {
   transform: translateY(-1px);
 }
 
+button:not(:disabled):active {
+  transform: translateY(1px) scale(0.99);
+}
+
 button:disabled {
   background: #2a2c31 !important;
   color: #7e828a !important;
@@ -142,11 +188,26 @@ button [class*="text-sm"] {
     rgba(10, 10, 12, 0.92) !important;
 }
 
+/* Add playful hover pop to character cards */
+[class*="fixed inset-0 bg-black/90"] button {
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+[class*="fixed inset-0 bg-black/90"] button:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4), 0 0 18px rgba(88, 101, 242, 0.28);
+}
+
 /* Soft animated pulse on brand heading */
 @keyframes discordPulse {
   0%,
   100% { filter: drop-shadow(0 0 0 rgba(88, 101, 242, 0)); }
   50% { filter: drop-shadow(0 0 12px rgba(88, 101, 242, 0.45)); }
+}
+
+@keyframes spinAura {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 #root h1[class*="bg-gradient-to-r"] {
