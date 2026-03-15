@@ -1,0 +1,88 @@
+:root {
+  --discord-bg: #313338;
+  --discord-surface: #2b2d31;
+  --discord-surface-alt: #1e1f22;
+  --discord-border: #3f4147;
+  --discord-text: #dbdee1;
+  --discord-text-muted: #b5bac1;
+  --discord-brand: #5865f2;
+  --discord-brand-hover: #4752c4;
+  --discord-success: #3ba55d;
+}
+
+body {
+  background: radial-gradient(circle at top, #3d3f45 0%, var(--discord-bg) 45%);
+  color: var(--discord-text);
+  font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#root > div {
+  background: transparent !important;
+}
+
+/* Soften dark utility panels into Discord-like cards */
+[class*="bg-zinc-900"],
+[class*="bg-zinc-800"],
+[class*="bg-zinc-950"] {
+  background-color: color-mix(in oklab, var(--discord-surface) 90%, #000) !important;
+  border-color: var(--discord-border) !important;
+}
+
+[class*="rounded-xl"],
+[class*="rounded-lg"] {
+  border-radius: 12px !important;
+}
+
+h1, h2, h3 {
+  letter-spacing: 0.01em;
+}
+
+button {
+  border-radius: 10px !important;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+button:not(:disabled) {
+  background-color: var(--discord-brand);
+  color: #fff;
+}
+
+button:not(:disabled):hover {
+  background-color: var(--discord-brand-hover) !important;
+  border-color: #7983f5;
+}
+
+button:disabled {
+  background-color: var(--discord-surface-alt) !important;
+  color: #80848e !important;
+  border-color: var(--discord-border);
+}
+
+/* Keep shop tiles visually layered */
+button [class*="text-xs"],
+button [class*="text-sm"] {
+  color: #f2f3f5;
+}
+
+[class*="text-zinc-400"],
+[class*="text-zinc-500"],
+[class*="text-zinc-600"] {
+  color: var(--discord-text-muted) !important;
+}
+
+[class*="text-green-400"] {
+  color: #57f287 !important;
+}
+
+[class*="border-zinc-700"],
+[class*="border-zinc-800"],
+[class*="border-zinc-600"] {
+  border-color: var(--discord-border) !important;
+}
+
+/* Subtle glass effect for side panels */
+[class*="p-4"][class*="border"] {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+}
