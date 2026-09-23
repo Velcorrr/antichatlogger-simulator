@@ -2,7 +2,7 @@ export const SAVE_KEY = 'antichatlogger.night.v1';
 export const clamp = (v, lo = 0, hi = 100) => Math.min(hi, Math.max(lo, v));
 export function createState() {
   return { version: 1, totalMinutes: 21*60+18, day:1, money:86.40, needs:{hunger:74,energy:86,hygiene:72,cleanliness:58,mood:76},
-    settings:{volume:.45,sensitivity:1,timeScale:.3,pixelScale:2,subtitles:true},
+    settings:{volume:.45,sensitivity:1,timeScale:.3,pixelScale:2,subtitles:true,touchControls:'auto'},
     hardware:{gpu:0,cpu:0,ram:0,ssd:0,monitor:0,keyboard:0,mouse:0,microphone:0,headset:0,router:0,chair:0},
     room:{light:false,blinds:true,fan:true,rain:true,objects:{},food:0,water:3,position:[.9,1.65,-.15],yaw:0,pitch:-.06},
     orders:[], events:{nextAt:21*60+100,outage:false,eventIndex:0}, notes:'ssd\nremember to send liltism that song\nwhy is there another new folder', photos:[], work:{lastAt:-1000}, temperature:48, savedAt:null };

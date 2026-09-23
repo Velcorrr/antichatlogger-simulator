@@ -11,10 +11,10 @@ npm install
 npm run dev
 ```
 
-Open the local URL Vite prints. Use a desktop browser with WebGL, a keyboard and a mouse. Click **New game** to begin, then click the room if the browser asks you to capture the mouse. Sound starts after interaction; available spoken voices depend on your browser and operating system.
+Open the local URL Vite prints in a browser with WebGL. The game supports a desktop keyboard and mouse or mobile touch controls. Tap or click **New game** to begin; on desktop, click the room if the browser asks you to capture the mouse. Sound starts after interaction; available spoken voices depend on your browser and operating system.
 
 ```sh
-npm test          # simulation and persistent social-state tests
+npm test          # simulation, social-state and touch-input tests
 npm run build    # produce a static website in dist/
 npm run preview  # serve the production build locally
 ```
@@ -43,6 +43,22 @@ Walk to the desk and interact with a screen or the chair to use the computer. Op
 
 The browser reserves Alt-Tab for real applications. Use F2 to switch in-game apps. Click the match to capture the mouse again. An Operator round continues while you are on the in-game desktop.
 
+### Touch controls
+
+Touch controls appear automatically on phones and tablets. Drag the left joystick to move; drag across the open right side of the view to look around. Use both at once to walk and look. Tap **Run** or **Crouch** to toggle those movement modes.
+
+| Touch button | Action |
+| --- | --- |
+| Interact / Pick / drop / Use | Interact with the room, pick up or drop an object, or use the held object |
+| Phone / Pause | Open the phone or pause menu |
+| Fire | Hold to shoot in Operator; drag the held button to keep looking while firing |
+| Aim / Reload | Hold to aim down sights; tap to reload |
+| Extract | Hold while near terminal A to extract data |
+| Scores / Chat / Spectate | Toggle the scoreboard, open match chat, or cycle living teammates after dying |
+| Discord | Switch from Operator to the in-game desktop |
+
+Use the desktop's on-screen match button to return to the running Operator match. Desktop apps and the phone work by tapping their buttons and fields; tapping a message field opens the device keyboard. The interface adapts to portrait and landscape, including scrollable app panels and chat. Landscape gives the most room for the 3D view and touch controls. Keyboard, mouse and pointer capture remain available for desktop play. In **Settings → Touch controls**, choose **Auto**, **On** or **Off** to override automatic detection.
+
 ## Included in this build
 
 - A 3D bedroom with lighting, blinds, rain, a fan, movable small objects, bed, phone, food delivery, hygiene and cleaning interactions.
@@ -55,6 +71,6 @@ This is a local simulation. Characters, calls, webcam, websites, videos, stores,
 
 ## Saves
 
-Progress is autosaved in this browser's local storage, including room state, purchases and conversations. Use **Escape → Export save**, or the desktop Settings app, to download a JSON backup. Import it to restore progress in another browser. Saves on a local development URL and saves on a published GitHub Pages URL are separate; clearing browser storage removes that URL's local save.
+Progress is autosaved in this browser's local storage, including room state, purchases and conversations. Use **Escape → Export save**, the touch pause button or the desktop Settings app to download a JSON backup. Import it to restore progress in another browser. Saves on a local development URL and saves on a published GitHub Pages URL are separate; clearing browser storage removes that URL's local save.
 
-The Node tests check simulation and social-state behavior without WebGL or browser UI. They do not replace a playtest of rendering, pointer capture or audio.
+The Node tests check simulation, social-state and touch-input behavior without WebGL or browser UI. They do not replace a playtest of rendering, touch gestures, pointer capture, the mobile keyboard or audio.

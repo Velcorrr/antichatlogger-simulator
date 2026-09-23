@@ -93,21 +93,36 @@ export function createDesktop(root, ctx) {
     <div class="d-desktop-head"><div class="d-account-mark">a.</div><div><span>steven</span><small>AntiChatLogger</small></div><span class="d-network"><i></i> connected</span></div>
     <nav class="d-shortcuts" aria-label="Desktop applications">${apps.map(app => `<button data-open="${app}" class="d-shortcut" title="Open ${app}"><span style="color:${APP_COLORS[app]}">${icon(app)}</span><label>${app}</label></button>`).join('')}</nav>
     <div class="d-window-area"></div>
-    <button class="d-leave" data-desktop-action="leave"><span>↖</span> Leave desk</button>
+    <div class="d-desktop-actions"><button class="d-leave" data-desktop-action="leave"><span>↖</span> Leave desk</button><button class="d-return-match" data-desktop-action="resume" hidden>↗ Return to match</button></div>
     <div class="d-switch-hint"><kbd>F2</kbd> switch to Operator</div>
     <nav class="d-taskbar" aria-label="Running applications"><button class="d-start" data-desktop-action="start" title="All applications"><span>◧</span> <b>start</b></button><div class="d-tasks"></div><div class="d-tray"><button class="d-tray-music" data-open="CloudTracks" title="Music">♫</button><span class="d-online-dot"></span><button class="d-clock" data-open="Settings"><b></b><small>Sunday, Sep 20</small></button></div></nav>
     <div class="d-start-menu" hidden><div class="d-start-profile"><b>steven</b><span>AntiChatLogger · local account</span></div>${apps.map(app => `<button data-open="${app}"><span style="color:${APP_COLORS[app]}">${icon(app)}</span>${app}</button>`).join('')}<button data-desktop-action="save">↓ Save session</button><button data-desktop-action="leave">↖ Stand up</button></div>`;
   const windowArea = root.querySelector('.d-window-area');
+  const startButton = root.querySelector('.d-start');
+  const startMenu = root.querySelector('.d-start-menu');
+  startMenu.id = 'desktop-applications';
+  startButton.setAttribute('aria-controls', startMenu.id);
+  startButton.setAttribute('aria-expanded', 'false');
+  function showStartMenu(show) {
+    startMenu.hidden = !show;
+    startButton.setAttribute('aria-expanded', String(show));
+  }
+  root.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !startMenu.hidden) {
+      event.preventDefault(); event.stopPropagation(); showStartMenu(false); startButton.focus();
+    }
+  });
   root.addEventListener('pointerdown', event => { event.stopPropagation(); });
   root.addEventListener('click', event => {
     const button = event.target.closest('[data-open],[data-desktop-action]');
     if (!button) return;
     ctx.audio?.click?.();
-    if (button.dataset.open) { open(button.dataset.open); root.querySelector('.d-start-menu').hidden = true; }
+    if (button.dataset.open) { open(button.dataset.open); showStartMenu(false); }
     switch (button.dataset.desktopAction) {
-      case 'start': root.querySelector('.d-start-menu').hidden = !root.querySelector('.d-start-menu').hidden; break;
+      case 'start': showStartMenu(startMenu.hidden); break;
       case 'leave': ctx.leavePC?.(); break;
-      case 'save': save(); toast('Session saved.'); root.querySelector('.d-start-menu').hidden = true; break;
+      case 'resume': if (ctx.isOperatorRunning?.()) ctx.resumeOperator?.(); break;
+      case 'save': save(); toast('Session saved.'); showStartMenu(false); break;
     }
   });
   function screenLight() {
@@ -129,7 +144,7 @@ export function createDesktop(root, ctx) {
     root.querySelectorAll('[data-task]').forEach(button => button.addEventListener('click', () => {
       const app = button.dataset.task;
       const win = windows.get(app);
-      if (app === active && win.status === 'open') minimize(app); else open(app);
+      if (app === active && win.status === 'open' && !document.body.classList.contains('touch-mode')) minimize(app); else open(app);
     }));
   }
   function minimize(app) {
@@ -142,6 +157,7 @@ export function createDesktop(root, ctx) {
     minimize(app); windows.get(app).status = 'closed'; renderTaskbar();
   }
   function maximize(app) {
+    if (document.body.classList.contains('touch-mode')) return;
     const win = windows.get(app);
     win.maximized = !win.maximized;
     win.el.classList.toggle('d-maximized', win.maximized);
@@ -168,7 +184,7 @@ export function createDesktop(root, ctx) {
     header.addEventListener('dblclick', event => { if (!event.target.closest('button')) maximize(app); });
     function handleMove(handle, resize) {
       handle.addEventListener('pointerdown', event => {
-        if (event.target.closest('button') || win.maximized) return;
+        if (event.target.closest('button') || win.maximized || document.body.classList.contains('touch-mode')) return;
         const rect = el.getBoundingClientRect();
         const initial = { x: event.clientX, y: event.clientY, left: rect.left, top: rect.top, width: rect.width, height: rect.height };
         handle.setPointerCapture(event.pointerId);
@@ -319,7 +335,7 @@ export function createDesktop(root, ctx) {
   function renderOperator() {
     const stats = state.operator || {};
     const container = windows.get('Operator').content;
-    container.innerHTML = `<div class="d-operator"><div class="d-op-scene"><div class="d-op-building"></div><div class="d-op-crosshair">+</div><span>SECTOR 04 / OFFICE</span></div><div class="d-op-content"><small class="d-eyebrow">MULTIPLAYER / TACTICAL</small><h1>OPERATOR<span>///</span></h1><p class="d-op-tagline">Every angle matters.</p><div class="d-op-profile"><div>ACL</div><p><b>AntiChatLogger</b><span>${esc(stats.rank || 'Silver II')} · ${stats.wins || 0} wins · ${stats.kills || 0} eliminations</span></p><i>● ONLINE</i></div><div class="d-op-options"><label>PLAYLIST<select name="playlist"><option value="casual">Casual · Office</option><option value="ranked">Ranked · Office</option></select></label><label>PRIMARY WEAPON<select name="weapon"><option value="AR-4">AR-4 · assault rifle</option><option value="SMG-9">SMG-9 · submachine gun</option><option value="DMR-7">DMR-7 · marksman rifle</option></select></label><label>ATTACHMENT<select name="attachment"><option value="Red dot">Red dot sight</option><option value="Compensator">Compensator · recoil control</option><option value="Extended magazine">Extended magazine</option></select></label></div><label class="d-op-party"><input type="checkbox" name="party" checked><span class="d-lilt-avatar">L</span><span><b>Liltism</b><small>Invite to party · regular duo</small></span><i>●</i></label><button class="d-op-play">FIND MATCH <span>↗</span></button><div class="d-op-controls">WASD move · Mouse aim · LMB fire · R reload<br>E objective · Tab scoreboard · F2 switch to desktop</div></div><footer>OFFICE / SECURE THE SERVER <span>v.1.04 · CONNECTION STABLE</span></footer></div>`;
+    container.innerHTML = `<div class="d-operator"><div class="d-op-scene"><div class="d-op-building"></div><div class="d-op-crosshair">+</div><span>SECTOR 04 / OFFICE</span></div><div class="d-op-content"><small class="d-eyebrow">MULTIPLAYER / TACTICAL</small><h1>OPERATOR<span>///</span></h1><p class="d-op-tagline">Every angle matters.</p><div class="d-op-profile"><div>ACL</div><p><b>AntiChatLogger</b><span>${esc(stats.rank || 'Silver II')} · ${stats.wins || 0} wins · ${stats.kills || 0} eliminations</span></p><i>● ONLINE</i></div><div class="d-op-options"><label>PLAYLIST<select name="playlist"><option value="casual">Casual · Office</option><option value="ranked">Ranked · Office</option></select></label><label>PRIMARY WEAPON<select name="weapon"><option value="AR-4">AR-4 · assault rifle</option><option value="SMG-9">SMG-9 · submachine gun</option><option value="DMR-7">DMR-7 · marksman rifle</option></select></label><label>ATTACHMENT<select name="attachment"><option value="Red dot">Red dot sight</option><option value="Compensator">Compensator · recoil control</option><option value="Extended magazine">Extended magazine</option></select></label></div><label class="d-op-party"><input type="checkbox" name="party" checked><span class="d-lilt-avatar">L</span><span><b>Liltism</b><small>Invite to party · regular duo</small></span><i>●</i></label><button class="d-op-play">FIND MATCH <span>↗</span></button><div class="d-op-controls"><span class="d-op-desktop-help">WASD move · Mouse aim · LMB fire · R reload<br>E objective · Tab scoreboard · F2 switch to desktop</span><span class="d-op-touch-help">Move with the left stick. Drag the right side to aim.<br>Use the on-screen Fire, Reload and Extract buttons.</span></div></div><footer>OFFICE / SECURE THE SERVER <span>v.1.04 · CONNECTION STABLE</span></footer></div>`;
     container.querySelector('.d-op-play').onclick = () => {
       ctx.startOperator?.({ ranked: container.querySelector('[name="playlist"]').value === 'ranked', weapon: container.querySelector('[name="weapon"]').value, attachment: container.querySelector('[name="attachment"]').value, party: container.querySelector('[name="party"]').checked });
     };
@@ -413,6 +429,7 @@ export function createDesktop(root, ctx) {
 
   function show() {
     visible = true; root.hidden = false; root.style.display = '';
+    root.querySelector('.d-return-match').hidden = !ctx.isOperatorRunning?.();
     if (!windows.size) { open('Discord'); open('CloudTracks'); focusWindow('Discord'); }
     screenLight(); renderTaskbar(); update(0);
   }
@@ -432,6 +449,7 @@ export function createDesktop(root, ctx) {
       if (videoSound && Math.floor(tick * 2) !== Math.floor((tick - dt) * 2)) ctx.audio?.click?.();
     }
     if (!visible) return;
+    root.querySelector('.d-return-match').hidden = !ctx.isOperatorRunning?.();
     root.querySelector('.d-clock b').textContent = ctx.formatTime?.() || '2:53 AM';
     root.querySelector('.d-tray-music').classList.toggle('d-music-on', state.music.playing);
     if (tick - lastTaskRefresh > 2) {
