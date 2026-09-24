@@ -121,3 +121,38 @@ test('the audio layer independently refuses any Velcorr speech request', () => {
   audio.voice('Velcorr', 'This must never be spoken.');
   assert.deepEqual(dispatched, []);
 });
+
+const flushReplies = () => new Promise(resolve => setImmediate(resolve));
+function withDialogue(reply) {
+  const state=createState();
+  const social=createSocial({state,dialogue:{selectResponders:()=>['Bitsproxy'],reply},save:()=>{}});
+  state.social.nextBurst=1e9;
+  return {state,social};
+}
+
+test('rapid player messages share one contextual request and carry a truthful reply source',async()=>{
+  const requests=[];
+  const {state,social}=withDialogue(async request=>{requests.push(request);return {messages:[{author:'Bitsproxy',text:'send the error'}],source:'ai'};});
+  social.send('bits');social.send('why does my button freeze');social.update(1);await flushReplies();social.update(2);
+  assert.equal(requests.length,1);assert.equal(requests[0].text,'why does my button freeze');
+  assert.ok(requests[0].history.some(m=>m.text==='bits'));
+  assert.equal(state.social.history.at(-1).text,'send the error');assert.equal(state.social.history.at(-1).source,'ai');
+  assert.equal(state.social.pendingChats.length,0);
+});
+
+test('newer messages replace a stale reply and unfinished requests remain in the save',async()=>{
+  let finish;const {state,social}=withDialogue(()=>new Promise(resolve=>{finish=resolve;}));
+  social.send('first question');social.update(1);await flushReplies();
+  assert.equal(state.social.pendingChats.length,1,'reload can recover the unfinished question');
+  social.send('actually a different question');finish({messages:[{author:'Bitsproxy',text:'stale answer'}],source:'ai'});await flushReplies();
+  assert.equal(state.social.pendingChats[0].text,'actually a different question');
+  assert.equal(state.social.queue.some(q=>q.text==='stale answer'),false);
+  social.destroy();
+});
+
+test('scripted fallback is identified and unknown response authors cannot enter chat',async()=>{
+  const {state,social}=withDialogue(async()=>({messages:[{author:'Administrator',text:'bad'},{author:'Bitsproxy',text:'try the circuit in hangouts'}],source:'scripted'}));
+  social.send('im bored');social.update(1);await flushReplies();social.update(3);
+  assert.equal(state.social.history.at(-1).source,'scripted');
+  assert.equal(state.social.history.some(m=>m.author==='Administrator'),false);
+});

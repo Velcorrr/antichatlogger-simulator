@@ -14,7 +14,7 @@ npm run dev
 Open the local URL Vite prints in a browser with WebGL. The game supports a desktop keyboard and mouse or mobile touch controls. Tap or click **New game** to begin; on desktop, click the room if the browser asks you to capture the mouse. Sound starts after interaction; available spoken voices depend on your browser and operating system.
 
 ```sh
-npm test          # simulation, social-state and touch-input tests
+npm test          # simulation, dialogue, AI, challenge and input tests
 npm run build    # produce a static website in dist/
 npm run preview  # serve the production build locally
 ```
@@ -61,6 +61,9 @@ Use the desktop's on-screen match button to return to the running Operator match
 
 ## Included in this build
 
+- Hangouts: Liltism's braking challenge, Bitsproxy's routing maze, and Fear's tablet logic puzzle. Open **Things to do** from the room, phone, pause menu or Discord, or launch Hangouts from the desktop. First wins earn $8–$12 in game money; clearing all three earns an extra $15. Replays earn $1.50 at most once per challenge every 20 game minutes. Records and progress are saved, and timers pause when switching apps or pausing.
+- Optional AI conversations with distinct character personalities, recent conversation context, and reactions to challenge progress. Scripted replies remain available without an account or connection.
+
 - A 3D bedroom with lighting, blinds, rain, a fan, movable small objects, bed, phone, food delivery, hygiene and cleaning interactions.
 - A day/night clock, needs, money, hardware purchases, fictional paid tasks, and local saves.
 - A windowed desktop with Discord-style GC and DMs, friend profiles, delayed replies, unread messages, a simulated group call and Liltism's animated webcam scene. Velcorr communicates through text only.
@@ -69,8 +72,16 @@ Use the desktop's on-screen match button to return to the running Operator match
 
 This is a local simulation. Characters, calls, webcam, websites, videos, stores, purchases and game opponents are simulated; there is no live Discord connection, real shopping, matchmaking or multiplayer server. Music and effects are synthesized with Web Audio. Dialogue uses browser speech synthesis when available. No microphone or webcam capture is required.
 
+### AI conversations
+
+Choose **Connect AI** in the in-game Discord toolbar, or **AI conversations** in the pause menu, then connect through Puter. The game uses Puter's hosted `openai/gpt-4.1-nano` model through its browser SDK. Each player connects their own Puter session; no shared API key is included in the website.
+
+Puter offers a limited free allowance, not unlimited free AI. Availability and limits can change; if the allowance runs out, Puter may offer a paid upgrade or use existing paid credits. See [Puter's quotas and credits](https://docs.puter.com/rate-limits-and-quotas/). You can keep playing with scripted replies and turn AI off at any time.
+
+After you connect, sending a game chat message sends that message, a short recent conversation, character descriptions and a small amount of challenge context to Puter and its model provider. Notes, photos and the full save are not sent. Ambient chat and challenge announcements stay scripted. Network errors and unavailable AI fall back to scripted replies; replies are labeled **AI** or **scripted** so the source is clear. Velcorr remains text-only.
+
 ## Saves
 
 Progress is autosaved in this browser's local storage, including room state, purchases and conversations. Use **Escape → Export save**, the touch pause button or the desktop Settings app to download a JSON backup. Import it to restore progress in another browser. Saves on a local development URL and saves on a published GitHub Pages URL are separate; clearing browser storage removes that URL's local save.
 
-The Node tests check simulation, social-state and touch-input behavior without WebGL or browser UI. They do not replace a playtest of rendering, touch gestures, pointer capture, the mobile keyboard or audio.
+The Node tests check simulation, social-state, dialogue, mocked AI connections, challenge rules and touch-input behavior without WebGL or browser UI. They do not replace a playtest of rendering, touch gestures, pointer capture, the mobile keyboard or audio, or a real authenticated AI session.

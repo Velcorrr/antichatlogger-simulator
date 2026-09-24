@@ -1,10 +1,13 @@
 import './desktop.css';
 import { SAVE_KEY } from './simulation.js';
+import { createActivities } from './activities.js';
+import './activities.css';
 
 const ICONS = {
   Discord: '<path d="M7 7c3-2 7-2 10 0l3 10-5 2-1-2h-4l-1 2-5-2 3-10Z"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/>',
   CloudTracks: '<path d="M4 16v-3m3 5V9m3 10V5m3 14V9m3 8v-5m3 4v-3"/>',
   Operator: '<path d="m12 3 8 4v10l-8 4-8-4V7l8-4Z"/><path d="M9 9h6v6H9zM12 1v4m0 14v4M1 12h4m14 0h4"/>',
+  Hangouts: '<path d="M6 7h12l3 10-3 2-4-4h-4l-4 4-3-2L6 7Z"/><path d="M7 10v4m-2-2h4m7-1h.01M18 13h.01"/>',
   Browser: '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 7h14M5 17h14"/>',
   Videos: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 6 3-6 3V9Z"/>',
   Files: '<path d="M3 7V5h7l2 3h9v12H3V7Z"/><path d="M3 10h18"/>',
@@ -12,7 +15,7 @@ const ICONS = {
   'Task Manager': '<path d="M3 4v16h18M5 15l4-6 4 4 3-8 4 5"/>',
   Trash: '<path d="M4 6h16M9 3h6M6 6l1 15h10l1-15M10 10v7m4-7v7"/>',
 };
-const APP_COLORS = { Discord: '#9398ec', CloudTracks: '#ffb477', Operator: '#c9cebc', Browser: '#86b7cf', Videos: '#de8c92', Files: '#dec681', Settings: '#a7b2c1', 'Task Manager': '#8cb8a5', Trash: '#a0a4af' };
+const APP_COLORS = { Discord: '#9398ec', CloudTracks: '#ffb477', Operator: '#c9cebc', Hangouts: '#b8ddb1', Browser: '#86b7cf', Videos: '#de8c92', Files: '#dec681', Settings: '#a7b2c1', 'Task Manager': '#8cb8a5', Trash: '#a0a4af' };
 const icon = (app, cls = '') => `<svg class="d-icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[app] || ICONS.Files}</svg>`;
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const dollars = value => `$${Number(value || 0).toFixed(2)}`;
@@ -68,6 +71,7 @@ export function createDesktop(root, ctx) {
   state.settings ||= { volume: .55, sensitivity: 1, timeScale: .3, pixelScale: 2, subtitles: true };
   state.hardware ||= Object.fromEntries(PARTS.map(([key]) => [key, 0]));
   let social = ctx.social;
+  let activities;
   let visible = false;
   let z = 20;
   let active = 'Discord';
@@ -129,6 +133,7 @@ export function createDesktop(root, ctx) {
     const brightness = active === 'Browser' ? .95 : active === 'Operator' ? .3 : active === 'Files' ? .75 : .6;
     ctx.events?.dispatchEvent(new CustomEvent('screen-light', { detail: { brightness } }));
     social?.setVisible?.(visible && active === 'Discord' && windows.get('Discord')?.status === 'open');
+    activities?.setVisible(visible && active === 'Hangouts' && windows.get('Hangouts')?.status === 'open');
   }
   function focusWindow(app) {
     const win = windows.get(app);
@@ -223,6 +228,7 @@ export function createDesktop(root, ctx) {
       case 'CloudTracks': renderMusic(); break;
       case 'Browser': renderBrowser(); break;
       case 'Operator': renderOperator(); break;
+      case 'Hangouts': activities = createActivities(container, ctx); break;
       case 'Files': renderFiles(); break;
       case 'Videos': renderVideos(); break;
       case 'Settings': renderSettings(); break;
@@ -433,9 +439,10 @@ export function createDesktop(root, ctx) {
     if (!windows.size) { open('Discord'); open('CloudTracks'); focusWindow('Discord'); }
     screenLight(); renderTaskbar(); update(0);
   }
-  function hide() { visible = false; root.hidden = true; social?.setVisible?.(false); }
+  function hide() { visible = false; root.hidden = true; social?.setVisible?.(false); activities?.setVisible(false); }
   function update(dt) {
     tick += dt;
+    activities?.update(dt);
     if (state.music.playing) {
       state.music.progress = (state.music.progress || 0) + dt;
       if (state.music.progress >= state.music.track.duration) { state.music.progress = 0; nextTrack(); }
